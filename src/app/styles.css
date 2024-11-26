@@ -1,0 +1,121 @@
+:root {
+    --main-background-color: #d9eef2;
+    --main-font: "Public Sans", sans-serif;
+    --main-font-color: #282d41;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--main-background-color);
+    font-family: var(--main-font);
+    color: var(--main-font-color);
+    padding: 15vh 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.current-weather-container {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    align-items: center;
+    height: fit-content;
+    width: fit-content;
+    padding: 5vh 3vw;
+    border-bottom: 1px solid #839193;
+}
+
+.current-weather-container p {
+    margin-bottom: 10px;
+    font-size: max(1vw, 15px);
+    text-wrap: nowrap;
+}
+
+#current-weather-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 20px;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#city-name {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: max(45px, 4vw);
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+#date {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#weather-description {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+#current-temperature {
+    font-size: max(100px, 8vw);
+    font-weight: 200;
+    margin: 0 max(25px, 3vw);
+    grid-column: 3;
+    grid-row: 1/span 3;
+}
+
+#measurement-unit {
+    grid-row: 1;
+    grid-column: 4;
+    font-size: max(25px, 2vw);
+    font-weight: 300;
+    cursor: pointer;
+}
+
+#humidity {
+    grid-row: 2;
+    grid-column: 4;
+}
+
+#wind {
+    grid-row: 3;
+    grid-column: 4;
+}
+
+#forecast-container {
+    display: flex;
+    padding: 5vh 0;
+}
+
+.forecast-icon {
+    height: 60px;
+    width: 60px;
+}
+
+.forecast-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    padding: 0 25px;
+}
+
+.temp-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.min-temp {
+    margin-left: 20px;
+}
