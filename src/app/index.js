@@ -8,6 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
             unit = "metric";
         }
 
+        //Displaying the data using the changed measurement system
         displayCurrentWeatherInfo().then();
         displayForecast().then();
     });
@@ -115,6 +116,11 @@ function formatForecastData(list) {
         let maxTemp = Math.round(list[listIndex].main.temp_max);
         let minTemp = Math.round(list[listIndex].main.temp_max);
 
+        /**
+         * The api returns forecast list for 40 hours.
+         * The first 4 hours are from current day, thus the first 4 items in the list are skipped.
+         * The last 4 hours are from the fifth day. They are skipped, because it represents only half of the day.
+         */
         for (let j = listIndex + 1; j < listIndex + 8; j++) {
             const maxTempForHour = Math.round(list[j].main.temp_max);
             const minTempForHour = Math.round(list[j].main.temp_min);
@@ -125,6 +131,7 @@ function formatForecastData(list) {
             if (minTempForHour < minTemp) {
                 minTemp = minTempForHour;
             }
+            //IconId will be only the numeric part of the icon code.
             iconIds.push(list[j].weather[0].icon.slice(0, 2));
         }
 
@@ -132,6 +139,8 @@ function formatForecastData(list) {
         if (maxTemp === -0) maxTemp = 0;
 
         const day = days[new Date(list[listIndex].dt * 1000).getDay()];
+
+        //Getting the worst case scenario icon id from the list.
         const iconId = Math.max(...iconIds) < 10 ? '0' + Math.max(...iconIds) : Math.max(...iconIds).toString();
 
         forecastData.push({min: minTemp, max: maxTemp, iconId: iconId, day: day});
