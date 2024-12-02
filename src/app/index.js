@@ -2,18 +2,13 @@ const units = {
     metric: {temp: "°C", wind: "m/s"},
     imperial: {temp: "°F", wind: "mph"}
 };
-let unit = "metric";
 
 window.addEventListener('DOMContentLoaded', () => {
+    let isMetric = true;
     document.querySelector(".unit-change-btn")?.addEventListener('click', async () => {
-        if (unit === "metric") {
-            unit = "imperial";
-        } else {
-            unit = "metric";
-        }
-
+        isMetric = !isMetric;
         //Displaying the data using the changed measurement system
-        await displayCurrentWeatherInfo();
+        await displayCurrentWeatherInfo(isMetric ? 'metric': 'imperial');
         await displayForecast();
     });
 });
@@ -45,7 +40,7 @@ function displayErrorMessage() {
     `;
 }
 
-async function displayCurrentWeatherInfo() {
+async function displayCurrentWeatherInfo(unit) {
     try {
         const currentWeather = await getCurrentWeather();
         const container = document.querySelector(".current-weather-container");
@@ -169,5 +164,5 @@ function getFormattedDate(timestamp) {
     return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`;
 }
 
-displayCurrentWeatherInfo();
+displayCurrentWeatherInfo('metric');
 displayForecast();
