@@ -1,7 +1,7 @@
 let unit = "metric";
 
 window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById("unit-change-btn")?.addEventListener('click', () => {
+    document.querySelector(".unit-change-btn")?.addEventListener('click', () => {
         if (unit === "metric") {
             unit = "imperial";
         } else {
@@ -27,16 +27,16 @@ async function getCurrentWeather() {
 }
 
 function displayErrorMessage() {
-    const mainContainer = document.getElementById("main-container");
+    const mainContainer = document.querySelector(".main-container");
 
     mainContainer.innerHTML = `
-        <h2 id="error-message">Error loading the weather data :(</h2>
+        <h2 class="error-message">Error loading the weather data :(</h2>
     `;
 }
 
 async function displayCurrentWeatherInfo() {
     const currentWeather = await getCurrentWeather().catch(displayErrorMessage);
-    const container = document.getElementById("current-weather-container");
+    const container = document.querySelector(".current-weather-container");
 
     if (!container) return;
 
@@ -54,19 +54,19 @@ async function displayCurrentWeatherInfo() {
 
     container.innerHTML = `
         <img
-         id="current-weather-icon"
+         class="current-weather-icon"
          src="https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png" 
          alt="Current weather type icon"
          />
-        <h2 id="city-name">${currentWeather.name}</h2>
-        <p id="date">${date}</p>
-        <p id="weather-description">${currentWeather.weather[0].description}</p>
+        <h2 class="city-name">${currentWeather.name}</h2>
+        <p class="date">${date}</p>
+        <p class="weather-description">${currentWeather.weather[0].description}</p>
 
-        <h1 id="current-temperature">${Math.round(currentWeather.main.temp)}</h1>
+        <h1 class="current-temperature">${Math.round(currentWeather.main.temp)}</h1>
 
-        <p id="measurement-unit">${tempUnitText}</p>
-        <p id="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
-        <p id="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${windUnitText}</p>
+        <p class="measurement-unit">${tempUnitText}</p>
+        <p class="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
+        <p class="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${windUnitText}</p>
     `;
 }
 
@@ -86,7 +86,7 @@ async function displayForecast() {
     const forecast = await getForecast().catch(displayErrorMessage);
 
     const data = formatForecastData(forecast.list);
-    const forecastContainer = document.getElementById("forecast-container");
+    const forecastContainer = document.querySelector(".forecast-container");
 
     if (!forecastContainer) return;
 
