@@ -18,8 +18,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function generateUrl(endpointType) {
+    const apiKey = "f4469421a57c390e7f71f9131b1444fd";
+    const latitude = "40.178";
+    const longitude = "44.5152";
+    return `https://api.openweathermap.org/data/2.5/${endpointType}?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${unit}`;
+}
+
 async function getCurrentWeather() {
-    const url = "https://api.openweathermap.org/data/2.5/weather?lat=40.178&lon=44.5152&appid=f4469421a57c390e7f71f9131b1444fd&units=" + unit;
+    const url = generateUrl('weather');
 
     const response = await fetch(url);
 
@@ -71,7 +78,7 @@ async function displayCurrentWeatherInfo() {
 }
 
 async function getForecast() {
-    const url = "https://api.openweathermap.org/data/2.5/forecast?lat=40.1872&lon=44.5152&appid=f4469421a57c390e7f71f9131b1444fd&units=" + unit;
+    const url = generateUrl("forecast");
 
     const response = await fetch(url);
 
@@ -159,7 +166,7 @@ function getFormattedDate(timestamp) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`
+    return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`;
 }
 
 displayCurrentWeatherInfo();
