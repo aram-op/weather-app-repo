@@ -1,7 +1,7 @@
 let unit = "metric";
 
 window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector(".unit-change-btn")?.addEventListener('click', () => {
+    document.querySelector(".unit-change-btn")?.addEventListener('click', async () => {
         if (unit === "metric") {
             unit = "imperial";
         } else {
@@ -9,8 +9,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         //Displaying the data using the changed measurement system
-        displayCurrentWeatherInfo().then();
-        displayForecast().then();
+        await displayCurrentWeatherInfo();
+        await displayForecast();
     });
 });
 
@@ -35,24 +35,25 @@ function displayErrorMessage() {
 }
 
 async function displayCurrentWeatherInfo() {
-    const currentWeather = await getCurrentWeather().catch(displayErrorMessage);
-    const container = document.querySelector(".current-weather-container");
+    try {
+        const currentWeather = await getCurrentWeather();
+        const container = document.querySelector(".current-weather-container");
 
-    if (!container) return;
+        if (!container) return;
 
-    const date = getFormattedDate(currentWeather.dt);
-    let tempUnitText;
-    let windUnitText;
+        const date = getFormattedDate(currentWeather.dt);
+        let tempUnitText;
+        let windUnitText;
 
-    if (unit === "metric") {
-        tempUnitText = "°C";
-        windUnitText = "m/s";
-    } else {
-        tempUnitText = "°F";
-        windUnitText = "mph";
-    }
+        if (unit === "metric") {
+            tempUnitText = "°C";
+            windUnitText = "m/s";
+        } else {
+            tempUnitText = "°F";
+            windUnitText = "mph";
+        }
 
-    container.innerHTML = `
+        container.innerHTML = `
         <img
          class="current-weather-icon"
          src="https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png" 
@@ -68,6 +69,10 @@ async function displayCurrentWeatherInfo() {
         <p class="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
         <p class="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${windUnitText}</p>
     `;
+    } catch (e) {
+        displayErrorMessage();
+        console.error('Error fetching current weather ', e);
+    }
 }
 
 async function getForecast() {
@@ -83,17 +88,18 @@ async function getForecast() {
 }
 
 async function displayForecast() {
-    const forecast = await getForecast().catch(displayErrorMessage);
+    try {
+        const forecast = await getForecast();
 
-    const data = formatForecastData(forecast.list);
-    const forecastContainer = document.querySelector(".forecast-container");
+        const data = formatForecastData(forecast.list);
+        const forecastContainer = document.querySelector(".forecast-container");
 
-    if (!forecastContainer) return;
+        if (!forecastContainer) return;
 
-    forecastContainer.innerHTML = '';
+        forecastContainer.innerHTML = '';
 
-    for (let item of data) {
-        forecastContainer.innerHTML += `
+        data.map((item) => {
+            forecastContainer.innerHTML += `
             <div class="forecast-item">
                 <p class="forecast-day">${item.day}</p>
                 <img class="forecast-icon" src="https://openweathermap.org/img/wn/${item.iconId}d@2x.png"/>
@@ -102,7 +108,11 @@ async function displayForecast() {
                     <span class="min-temp">${item.min}</span>
                 </div>
             </div>
-        `
+        `;
+        });
+    } catch (e) {
+        displayErrorMessage();
+        console.error('Error fetching weather forecast ', e);
     }
 }
 
@@ -157,5 +167,5 @@ function getFormattedDate(timestamp) {
     return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`
 }
 
-displayCurrentWeatherInfo().then();
-displayForecast().then();
+displayCurrentWeatherInfo();
+displayForecast();
