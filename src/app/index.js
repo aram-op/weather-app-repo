@@ -1,21 +1,27 @@
-let unit = "metric";
+const units = {
+    metric: {temp: "°C", wind: "m/s"},
+    imperial: {temp: "°F", wind: "mph"}
+};
 
 window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById("unit-change-btn")?.addEventListener('click', () => {
-        if (unit === "metric") {
-            unit = "imperial";
-        } else {
-            unit = "metric";
-        }
-
+    let isMetric = true;
+    document.querySelector(".unit-change-btn")?.addEventListener('click', async () => {
+        isMetric = !isMetric;
         //Displaying the data using the changed measurement system
-        displayCurrentWeatherInfo().then();
-        displayForecast().then();
+        await displayCurrentWeatherInfo(isMetric ? 'metric': 'imperial');
+        await displayForecast();
     });
 });
 
+function generateUrl(endpointType) {
+    const apiKey = "f4469421a57c390e7f71f9131b1444fd";
+    const latitude = "40.178";
+    const longitude = "44.5152";
+    return `https://api.openweathermap.org/data/2.5/${endpointType}?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=${unit}`;
+}
+
 async function getCurrentWeather() {
-    const url = "https://api.openweathermap.org/data/2.5/weather?lat=40.178&lon=44.5152&appid=f4469421a57c390e7f71f9131b1444fd&units=" + unit;
+    const url = generateUrl('weather');
 
     const response = await fetch(url);
 
@@ -27,51 +33,47 @@ async function getCurrentWeather() {
 }
 
 function displayErrorMessage() {
-    const mainContainer = document.getElementById("main-container");
+    const mainContainer = document.querySelector(".main-container");
 
     mainContainer.innerHTML = `
-        <h2 id="error-message">Error loading the weather data :(</h2>
+        <h2 class="error-message">Error loading the weather data :(</h2>
     `;
 }
 
-async function displayCurrentWeatherInfo() {
-    const currentWeather = await getCurrentWeather().catch(displayErrorMessage);
-    const container = document.getElementById("current-weather-container");
+async function displayCurrentWeatherInfo(unit) {
+    try {
+        const currentWeather = await getCurrentWeather();
+        const container = document.querySelector(".current-weather-container");
 
-    if (!container) return;
+        if (!container) return;
 
-    const date = getFormattedDate(currentWeather.dt);
-    let tempUnitText;
-    let windUnitText;
+        const date = getFormattedDate(currentWeather.dt);
+        const {temp, wind} = units[unit];
 
-    if (unit === "metric") {
-        tempUnitText = "°C";
-        windUnitText = "m/s";
-    } else {
-        tempUnitText = "°F";
-        windUnitText = "mph";
-    }
-
-    container.innerHTML = `
+        container.innerHTML = `
         <img
-         id="current-weather-icon"
+         class="current-weather-icon"
          src="https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png" 
          alt="Current weather type icon"
          />
-        <h2 id="city-name">${currentWeather.name}</h2>
-        <p id="date">${date}</p>
-        <p id="weather-description">${currentWeather.weather[0].description}</p>
+        <h2 class="city-name">${currentWeather.name}</h2>
+        <p class="date">${date}</p>
+        <p class="weather-description">${currentWeather.weather[0].description}</p>
 
-        <h1 id="current-temperature">${Math.round(currentWeather.main.temp)}</h1>
+        <h1 class="current-temperature">${Math.round(currentWeather.main.temp)}</h1>
 
-        <p id="measurement-unit">${tempUnitText}</p>
-        <p id="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
-        <p id="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${windUnitText}</p>
+        <p class="measurement-unit">${temp}</p>
+        <p class="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
+        <p class="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${wind}</p>
     `;
+    } catch (e) {
+        displayErrorMessage();
+        console.error('Error fetching current weather ', e);
+    }
 }
 
 async function getForecast() {
-    const url = "https://api.openweathermap.org/data/2.5/forecast?lat=40.1872&lon=44.5152&appid=f4469421a57c390e7f71f9131b1444fd&units=" + unit;
+    const url = generateUrl("forecast");
 
     const response = await fetch(url);
 
@@ -83,17 +85,18 @@ async function getForecast() {
 }
 
 async function displayForecast() {
-    const forecast = await getForecast().catch(displayErrorMessage);
+    try {
+        const forecast = await getForecast();
 
-    const data = formatForecastData(forecast.list);
-    const forecastContainer = document.getElementById("forecast-container");
+        const data = formatForecastData(forecast.list);
+        const forecastContainer = document.querySelector(".forecast-container");
 
-    if (!forecastContainer) return;
+        if (!forecastContainer) return;
 
-    forecastContainer.innerHTML = '';
+        forecastContainer.innerHTML = '';
 
-    for (let item of data) {
-        forecastContainer.innerHTML += `
+        data.map((item) => {
+            forecastContainer.innerHTML += `
             <div class="forecast-item">
                 <p class="forecast-day">${item.day}</p>
                 <img class="forecast-icon" src="https://openweathermap.org/img/wn/${item.iconId}d@2x.png"/>
@@ -102,17 +105,21 @@ async function displayForecast() {
                     <span class="min-temp">${item.min}</span>
                 </div>
             </div>
-        `
+        `;
+        });
+    } catch (e) {
+        displayErrorMessage();
+        console.error('Error fetching weather forecast ', e);
     }
 }
 
 function formatForecastData(list) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    let forecastData = [];
+    const forecastData = [];
 
     for (let i = 0; i < 4; i++) {
-        let listIndex = 4 + 8 * i;
-        let iconIds = [];
+        const listIndex = 4 + 8 * i;
+        const iconIds = [];
         let maxTemp = Math.round(list[listIndex].main.temp_max);
         let minTemp = Math.round(list[listIndex].main.temp_max);
 
@@ -154,8 +161,8 @@ function getFormattedDate(timestamp) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`
+    return `${time}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`;
 }
 
-displayCurrentWeatherInfo().then();
-displayForecast().then();
+displayCurrentWeatherInfo('metric');
+displayForecast();
