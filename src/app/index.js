@@ -1,3 +1,7 @@
+const units = {
+    metric: {temp: "°C", wind: "m/s"},
+    imperial: {temp: "°F", wind: "mph"}
+};
 let unit = "metric";
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -42,16 +46,7 @@ async function displayCurrentWeatherInfo() {
         if (!container) return;
 
         const date = getFormattedDate(currentWeather.dt);
-        let tempUnitText;
-        let windUnitText;
-
-        if (unit === "metric") {
-            tempUnitText = "°C";
-            windUnitText = "m/s";
-        } else {
-            tempUnitText = "°F";
-            windUnitText = "mph";
-        }
+        const {temp, wind} = units[unit];
 
         container.innerHTML = `
         <img
@@ -65,9 +60,9 @@ async function displayCurrentWeatherInfo() {
 
         <h1 class="current-temperature">${Math.round(currentWeather.main.temp)}</h1>
 
-        <p class="measurement-unit">${tempUnitText}</p>
+        <p class="measurement-unit">${temp}</p>
         <p class="humidity">Humidity: ${Math.round(currentWeather.main.humidity)}%</p>
-        <p class="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${windUnitText}</p>
+        <p class="wind">Wind: ${Math.round(currentWeather.wind.speed)} ${wind}</p>
     `;
     } catch (e) {
         displayErrorMessage();
@@ -118,11 +113,11 @@ async function displayForecast() {
 
 function formatForecastData(list) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    let forecastData = [];
+    const forecastData = [];
 
     for (let i = 0; i < 4; i++) {
-        let listIndex = 4 + 8 * i;
-        let iconIds = [];
+        const listIndex = 4 + 8 * i;
+        const iconIds = [];
         let maxTemp = Math.round(list[listIndex].main.temp_max);
         let minTemp = Math.round(list[listIndex].main.temp_max);
 
